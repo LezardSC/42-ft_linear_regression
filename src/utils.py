@@ -11,3 +11,6 @@ def get_path(file_name):
 	csv_path = os.path.join(script_dir, file_name)
 
 	return csv_path
+
+def compute_min_max(n):
+	return n.min(), n.max()

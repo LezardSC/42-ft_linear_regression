@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pds
 import matplotlib.pyplot as plt
 
-from utils import get_path, normalize
+from utils import get_path, normalize, compute_min_max
 
 def draw_data(x, y):
 	fig, ax = plt.subplots()
@@ -13,11 +13,17 @@ def draw_data(x, y):
 	plt.tight_layout()
 	plt.show()
 
-def load_model_params(theta0, theta1, km_min, km_max, price_min, price_max):
+def export_model_params(theta0, theta1, km_min, km_max, price_min, price_max):
 	csv_path = get_path('../model_params/model_params.csv')
-
-	with open(csv_path, 'w') as f:
-		f.write(f"theta0,theta1,km_min,km_max,price_min,price_max\n{theta0},{theta1}")
+	file = pds.DataFrame([{
+		'theta0':    theta0,
+		'theta1':    theta1,
+		'km_min':    km_min,
+		'km_max':    km_max,
+		'price_min': price_min,
+		'price_max': price_max
+	}])
+	pds.to_csv(csv_path, index=False)
 
 
 def parse_data():
@@ -29,19 +35,19 @@ def parse_data():
 
 	return km, price
 
+def gradient_descent():
+	return 1.0, 2.0
 
 def train_model():
+	learning_rate = 0
+	n_iterations = 0
 	km, price = parse_data()
-	theta0 = 1.0
-	theta1 = 2.0
-
-	km_min, km_max = km.min(), km.max()
-	price_min, price_max = price.min(), price.max()
-
+	km_min, km_max = compute_min_max(km)
+	price_min, price_max = compute_min_max(price)
 	km_norm    = normalize(km, km_min, km_max)
 	price_norm = normalize(price, price_min, price_max)
-
-	load_model_params(theta0, theta1, km_min, km_max, price_min, price_max)
+	theta0, theta1 = gradient_descent()
+	export_model_params(theta0, theta1, km_min, km_max, price_min, price_max)
 	draw_data(km, price)
 	return
 
