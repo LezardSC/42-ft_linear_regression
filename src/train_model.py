@@ -39,20 +39,35 @@ def parse_data():
 
 	return km, price
 
-def gradient_descent():
-	return 1.0, 2.0
+def gradient_descent(km_norm, price_norm):
+	km_norm = km_norm.ravel()
+	price_norm = price_norm.ravel()
+	learning_rate = 0.5
+	n_iterations = 1000
+	m = len(km_norm)
+	theta0, theta1 = 0.0, 0.0
+
+	for _ in range(n_iterations):
+		estimate_price = theta1 * km_norm + theta0
+		cost_function = estimate_price - price_norm
+
+		gradient0 = (1 / m) * cost_function.sum()
+		gradient1 = (1 / m) * (cost_function * km_norm).sum()
+
+		theta0 -= learning_rate * gradient0
+		theta1 -= learning_rate * gradient1
+	
+	return theta0, theta1
 
 def train_model():
-	learning_rate = 0
-	n_iterations = 0
 	km, price = parse_data()
 	km_min, km_max = compute_min_max(km)
 	price_min, price_max = compute_min_max(price)
-	km_norm    = normalize(km, km_min, km_max)
+	km_norm = normalize(km, km_min, km_max)
 	price_norm = normalize(price, price_min, price_max)
-	theta0, theta1 = gradient_descent()
+	theta0, theta1 = gradient_descent(km_norm, price_norm)
 	export_model_params(theta0, theta1, km_min, km_max, price_min, price_max)
-	draw_data(km, price)
+	# draw_data(km, price)
 	return
 
 

@@ -48,7 +48,7 @@ def predict_price():
 
 	km_norm = normalize(km, km_min, km_max)
 
-	price_norm = theta0 + theta1 * km_norm
+	price_norm = theta1 * km_norm + theta0
 	price = denormalize(price_norm, price_min, price_max)
 
 	print(f'estimate price: {price:.2f}€')
