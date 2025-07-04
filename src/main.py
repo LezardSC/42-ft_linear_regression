@@ -1,7 +1,12 @@
-import os
 import numpy as np
 import pandas as pds
 import matplotlib.pyplot as plt
+
+from predict_price import predict_price
+from train_model import train_model
+from utils import normalize
+from utils import denormalize
+from utils import get_path
 
 def draw_data(x, y):
 	fig, ax = plt.subplots()
@@ -13,26 +18,32 @@ def draw_data(x, y):
 	plt.show()
 
 def parse_data():
-	script_dir = os.path.dirname(os.path.abspath(__file__))
-	csv_path = os.path.join(script_dir, '../data/data.csv')
+	csv_path = get_path('../data/data.csv')
 	data = pds.read_csv(csv_path)
 	
 	km = data[['km']].values
 	price = data[['price']].values
-	km_scaled = (km - km.min(axis=0)) / (km.max(axis=0) - km.min(axis=0))
-	price_scaled = (price - price.min(axis=0)) / (price.max(axis=0) - price.min(axis=0))
-	km_unscaled = km_scaled * (km.max(axis=0) - km.min(axis=0)) + km.min(axis=0)
-	price_unscaled = price_scaled * (price.max(axis=0) - price.min(axis=0)) + price.min(axis=0)
-	# print(km)
-	# print(price)
-	# print(f'my price scaled: {price_scaled}')
-	
-	# draw_data(km, price)
 
-# y = theta0 + (theta1 * x)
+	return km, price
+	
 
 def main():
-	parse_data()
+	km, price = parse_data()
+	theta0 = 0
+	theta1 = 0
+
+	km_scaled = normalize(km)
+	price_scaled = normalize(price)
+
+	# predict_price(theta0, theta1, km)
+	train_model()
+
+	# draw_data(km, price)
+
+	# km_min, km_max = km.min(axis=0), km.max(axis=0)
+	# price_min, price_max = price.min(axis=0), price.max(axis=0)
+	# km_unscaled = denormalize(km_scaled, km.min(axis=0), km.max(axis=0))
+	# price_unscaled = denormalize(price_scaled, price.min(axis=0), price.max(axis=0))
 
 if __name__ == '__main__':
 	main()

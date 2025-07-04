@@ -16,3 +16,12 @@ Normalize the datas
 
 
 We can simply use open or the library csv, but the library panda does a lot for us since it converts automatically into an array the values
+
+
+
+installation:
+source venv/bin/activate
+pip install -r requirements.txt
+rm theta/theta.csv
+
+faire makefile pour rm le precedent modele
