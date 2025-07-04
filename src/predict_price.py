@@ -1,7 +1,7 @@
 import pandas as pds
 import os
 
-from utils import get_path, normalize, denormalize
+from utils import get_path
 
 def get_model_params():
 

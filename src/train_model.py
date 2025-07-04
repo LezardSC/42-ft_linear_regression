@@ -3,13 +3,13 @@ import pandas as pds
 import matplotlib.pyplot as plt
 import os
 
-from utils import get_path, normalize, compute_min_max, denormalize, denormalize_thetas
+from utils import get_path, normalize, compute_min_max, denormalize_thetas
 
 def draw_data(x, y, theta0, theta1):
 	fig, ax = plt.subplots()
 
-	ax.set_xlabel('km')
-	ax.set_ylabel('price')
+	ax.set_xlabel('x')
+	ax.set_ylabel('y')
 	ax.set_title('linear regression')
 
 	ax.scatter(x, y, alpha=0.6)
@@ -38,25 +38,25 @@ def parse_data():
 	csv_path = get_path('../data/data.csv')
 	data = pds.read_csv(csv_path)
 	
-	km = data[['km']].values.astype(float)
-	price = data[['price']].values.astype(float)
+	x = data.iloc[:, 0].values.astype(float)
+	y = data.iloc[:, 1].values.astype(float)
 
-	return km, price
+	return x, y
 
-def gradient_descent(km_norm, price_norm):
-	km_norm = km_norm.ravel()
-	price_norm = price_norm.ravel()
+def gradient_descent(x_norm, y_norm):
+	x_norm = x_norm.ravel()
+	y_norm = y_norm.ravel()
 	learning_rate = 0.1
 	n_iterations = 1000
-	m = len(km_norm)
+	m = len(x_norm)
 	theta0, theta1 = 0.0, 0.0
 
 	for _ in range(n_iterations):
-		estimate_price = theta1 * km_norm + theta0
-		cost_function = estimate_price - price_norm
+		estimate_y = theta1 * x_norm + theta0
+		cost_function = estimate_y - y_norm
 
 		gradient0 = (1 / m) * cost_function.sum()
-		gradient1 = (1 / m) * (cost_function * km_norm).sum()
+		gradient1 = (1 / m) * (cost_function * x_norm).sum()
 
 		theta0 -= learning_rate * gradient0
 		theta1 -= learning_rate * gradient1
@@ -64,15 +64,15 @@ def gradient_descent(km_norm, price_norm):
 	return theta0, theta1
 
 def train_model():
-	km, price = parse_data()
-	km_min, km_max = compute_min_max(km)
-	price_min, price_max = compute_min_max(price)
-	km_norm = normalize(km, km_min, km_max)
-	price_norm = normalize(price, price_min, price_max)
-	theta0, theta1 = gradient_descent(km_norm, price_norm)
-	theta0, theta1 = denormalize_thetas(theta0, theta1, km_min, km_max, price_min, price_max)
+	x, y = parse_data()
+	x_min, x_max = compute_min_max(x)
+	y_min, y_max = compute_min_max(y)
+	x_norm = normalize(x, x_min, x_max)
+	y_norm = normalize(y, y_min, y_max)
+	theta0, theta1 = gradient_descent(x_norm, y_norm)
+	theta0, theta1 = denormalize_thetas(theta0, theta1, x_min, x_max, y_min, y_max)
 	export_model_params(theta0, theta1)
-	draw_data(km, price, theta0, theta1)
+	draw_data(x, y, theta0, theta1)
 	return
 
 
