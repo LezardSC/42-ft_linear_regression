@@ -7,10 +7,18 @@ from utils import get_path, normalize, compute_min_max, denormalize, denormalize
 
 def draw_data(x, y, theta0, theta1):
 	fig, ax = plt.subplots()
+
 	ax.set_xlabel('km')
 	ax.set_ylabel('price')
 	ax.set_title('linear regression')
+
 	ax.scatter(x, y, alpha=0.6)
+
+	x_min, x_max = x.min(), x.max()
+	xs = np.linspace(x_min, x_max, 100)
+	ys = theta1 * xs + theta0
+	ax.plot(xs, ys, color='red', linewidth=1.5)
+
 	plt.tight_layout()
 	plt.show()
 
@@ -39,7 +47,7 @@ def gradient_descent(km_norm, price_norm):
 	km_norm = km_norm.ravel()
 	price_norm = price_norm.ravel()
 	learning_rate = 0.1
-	n_iterations = 2000
+	n_iterations = 1000
 	m = len(km_norm)
 	theta0, theta1 = 0.0, 0.0
 
