@@ -8,9 +8,9 @@ def denormalize(n_norm, min, max):
 
 def get_path(file_name):
 	script_dir = os.path.dirname(os.path.abspath(__file__))
-	csv_path = os.path.join(script_dir, file_name)
+	path = os.path.join(script_dir, file_name)
 
-	return csv_path
+	return path
 
 def compute_min_max(n):
 	return n.min(), n.max()

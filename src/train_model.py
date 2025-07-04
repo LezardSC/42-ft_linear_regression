@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pds
 import matplotlib.pyplot as plt
+import os
 
 from utils import get_path, normalize, compute_min_max
 
@@ -15,6 +16,9 @@ def draw_data(x, y):
 
 def export_model_params(theta0, theta1, km_min, km_max, price_min, price_max):
 	csv_path = get_path('../model_params/model_params.csv')
+
+	os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+
 	file = pds.DataFrame([{
 		'theta0':    theta0,
 		'theta1':    theta1,
@@ -23,7 +27,7 @@ def export_model_params(theta0, theta1, km_min, km_max, price_min, price_max):
 		'price_min': price_min,
 		'price_max': price_max
 	}])
-	pds.to_csv(csv_path, index=False)
+	file.to_csv(csv_path, index=False)
 
 
 def parse_data():
