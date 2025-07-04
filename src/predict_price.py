@@ -13,7 +13,7 @@ def get_model_params():
 		
 		file = pds.read_csv(path)
 
-		expected = {'theta0','theta1','km_min','km_max','price_min','price_max'}
+		expected = {'theta0','theta1'}
 		if not expected.issubset(file.columns):
 			missing = expected - set(file.columns)
 			raise KeyError(f"Missing columns: {', '.join(missing)}")
@@ -21,21 +21,17 @@ def get_model_params():
 		row = file.loc[0]
 		theta0 = float(row['theta0'])
 		theta1 = float(row['theta1'])
-		km_min = float(row['km_min'])
-		km_max = float(row['km_max'])
-		price_min = float(row['price_min'])
-		price_max = float(row['price_max'])
 
-		return theta0, theta1, km_min, km_max, price_min, price_max
+		return theta0, theta1
 	except Exception as e:
 		print(f"Warning: Could not load model params in {path} : {e}")
-		return 0.0, 0.0, 0, 0, 0, 0
+		return 0.0, 0.0
 
 
 
 def predict_price():
 	try:
-		theta0, theta1, km_min, km_max, price_min, price_max = get_model_params()
+		theta0, theta1 = get_model_params()
 	except Exception as e:
 		print(f"Error: Failed to load parameters {e}")
 
@@ -46,10 +42,7 @@ def predict_price():
 		print("Error : please enter a valid number for mileage.")
 		return
 
-	km_norm = normalize(km, km_min, km_max)
-
-	price_norm = theta1 * km_norm + theta0
-	price = denormalize(price_norm, price_min, price_max)
+	price = theta1 * km + theta0
 
 	print(f'estimate price: {price:.2f}€')
 
