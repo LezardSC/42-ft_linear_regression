@@ -3,7 +3,7 @@ import os
 
 from utils import get_path
 
-def get_model_params():
+def load_model_params():
 
 	path = get_path('../model_params/model_params.csv')
 
@@ -31,7 +31,7 @@ def get_model_params():
 
 def predict_price():
 	try:
-		theta0, theta1 = get_model_params()
+		theta0, theta1 = load_model_params()
 	except Exception as e:
 		print(f"Error: Failed to load parameters {e}")
 
