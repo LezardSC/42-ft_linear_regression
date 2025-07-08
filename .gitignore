@@ -1,4 +1,8 @@
 /venv
+/.venv
 /data
 /theta/theta.csv
 /model
+*/__pycache__
+/.pytest_cache
+/.vscode
