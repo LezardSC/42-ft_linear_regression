@@ -98,6 +98,12 @@ def build_parser(description: str) -> argparse.ArgumentParser:
 		dest="draw_linear_regression",
 		help="Draw a graph of the linear regression."
 	)
+	parser.add_argument(
+		"-e", "--evaluate",
+		action="store_true",
+		dest="evaluate_prediction",
+		help="Evaluate the precision of the linear regression."
+	)
 	return parser
 
 
@@ -127,12 +133,21 @@ def main():
 	y = df.iloc[:, 1].to_numpy(dtype=float)
 
 	model = LinearRegression(learning_rate=args.learning_rate, n_iter=args.n_iter)
-	model.fit(x, y)
+	try:
+		model.fit(x, y)
+	except ValueError as e:
+		print(f"Error fitting model: {e}")
+		return
+
 	model.save(csv_path=args.model)
 	if args.draw_linear_regression:
 		model.draw_data(x, y)
-
-
+	if args.evaluate_prediction:
+		try:
+			model.evaluate(x, y)
+		except ValueError as e:
+			print(f"Error evaluating model: {e}")
+			return
 
 if __name__ == '__main__':
 	main()

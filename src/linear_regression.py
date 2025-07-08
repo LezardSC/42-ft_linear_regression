@@ -133,7 +133,8 @@ class LinearRegression:
 		Raises:
 			ValueError: If x or y is empty.
 		"""
-
+		if x.shape != y.shape:
+			raise ValueError("x and y must have the same shape")
 		if x.size == 0 or y.size == 0:
 			raise ValueError("x and y should contain at least one value.")
 		
@@ -145,6 +146,31 @@ class LinearRegression:
 
 		theta0_norm, theta1_norm = self._gradient_descent(x_norm, y_norm)
 		self.theta0, self.theta1 = self._denormalize_thetas(theta0_norm, theta1_norm)
+
+
+	def evaluate(self, x: np.ndarray, y: np.ndarray) -> dict:
+		"""
+		"""
+		
+		if x.shape != y.shape:
+			raise ValueError("x and y must have the same shape")
+
+		y_pred = self.theta0 + self.theta1 * x
+		residual = y - y_pred
+
+		sum_residuals = np.sum(residual ** 2)
+		sum_total = np.sum((y - y.mean()) ** 2)
+
+		r2 = 1 - sum_residuals / sum_total
+		rmse = np.sqrt(sum_residuals / len(y))
+		mae = np.mean(np.abs(residual))
+
+		print("Model performance on dataset:")
+		print(f"• Variance explained (R²): the model accounts for {r2*100:.1f}% of the variation in the target.")
+		print(f"• Root-mean-square error (RMSE): when penalizing large errors more, the typical error is {rmse:.2f}.")
+		print(f"• Mean absolute error (MAE): on average, absolute errors are about {mae:.2f}.")
+		
+		return {'r2': r2, 'rmse': rmse, 'mae': mae}
 
 	def draw_data(self, x, y):
 		"""
@@ -170,6 +196,7 @@ class LinearRegression:
 		plt.tight_layout()
 		plt.show()
 
+
 	def save(self, csv_path=None):
 		"""
 		Save learned theta parameters to a CSV file.
@@ -188,6 +215,7 @@ class LinearRegression:
 			'theta1': self.theta1,
 		}])
 		file.to_csv(csv_path, index=False)
+
 
 	def load(self, csv_path=None):
 		"""
@@ -229,6 +257,7 @@ class LinearRegression:
 			self.theta1 = float(row['theta1'])
 		except ValueError as e:
 			raise ValueError(f"Can't convert θ in number : {e}")
+
 
 	def predict(self, x: float):
 		"""

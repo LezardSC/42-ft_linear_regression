@@ -19,7 +19,7 @@ An introduction to machine learning: a simple univariate linear regression model
 
 ## Introduction
 
-This repository contains a simple implementation of linear regression from scratch, using gradient descent and min-max normalization. The goal is to predict the price of a car based on its mileage.
+This repository contains a simple implementation of linear regression from scratch, using gradient descent and min–max normalization. The goal is to predict a target value *y* (e.g., car price) from a single feature *x* (e.g., mileage).
 
 ## How It Works: Conceptual Overview
 
@@ -126,7 +126,7 @@ python train_model.py \
   --model path/to/model.csv \
   --learning-rate 0.1 \
   --iter 5000 \
-  [--plot]
+  [--plot] [--evaluate]
 ```
 
 * `--data` (`-d`): Path to the training data CSV (default: `data/data.csv`).
@@ -134,8 +134,21 @@ python train_model.py \
 * `--learning-rate` (`-lr`): Gradient descent step size (0.001–1.0, default: 0.1).
 * `--iter` (`-i`): Number of gradient descent iterations (1–50000, default: 5000).
 * `--plot` (`-p`): Display a scatter plot of the data and the fitted regression line.
+* `--evaluate` (`-e`): Print performance metrics (R², RMSE, MAE) after training.
 
 After training, the model parameters are saved to the specified CSV.
+
+### Evaluating Model Performance
+
+If you prefer a standalone evaluation script, you can run:
+```bash
+python evaluate_model.py \
+  --data path/to/data.csv \
+  --model path/to/model.csv \
+```
+
+This will load the same data and model parameters.
+There is no real point in using this program instead of `train_model.py --evaluate` with but the subject ask for a program to evaluate the model, so I did it.
 
 ### Predicting Prices
 
@@ -153,13 +166,14 @@ You will be prompted to enter a mileage value (0 to 1,000,000). The script loads
 ```
 ft_linear_regression/
 ├── data/
-│   └── data.csv			# Sample or user-provided dataset
+│   └── data.csv              # Sample or user-provided dataset
 ├── model/
-│   └── model.csv		   # Trained model parameters (theta0, theta1)
+│   └── model.csv             # Trained model parameters (theta0, theta1)
 ├── src/
-│	├── linear_regression.py	# Core implementation of LinearRegression class
-│	├── train_model.py		  # CLI for training the model
+│	├── linear_regression.py   # Core implementation of LinearRegression class
+│	├── train_model.py		   # CLI for training the model
 │	├── predict_price.py		# CLI for predicting prices
+│	├── evaluate_model.py   # CLI for standalone evaluation
 │	└── utils.py				# Path helper
 ├── tests/
 │   ├── test_cli.py		 # End-to-end CLI tests
