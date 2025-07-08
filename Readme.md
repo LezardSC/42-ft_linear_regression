@@ -1,3 +1,6 @@
+
+
+
 estimate price program
 
 estimatePrice(mileage) = θ0 + (θ1 ∗ mileage)
