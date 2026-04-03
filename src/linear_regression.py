@@ -150,6 +150,11 @@ class LinearRegression:
 
 	def evaluate(self, x: np.ndarray, y: np.ndarray) -> dict:
 		"""
+		Evaluate the model.
+
+		Parameters:
+			x (np.ndarray): Feature values.
+			y (np.ndarray): Target values.
 		"""
 		
 		if x.shape != y.shape:
