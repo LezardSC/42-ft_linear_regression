@@ -79,8 +79,13 @@ This workflow produces a linear function capable of estimating car price from mi
 
 ## Prerequisites
 
-* Python 3.7 or higher
+* Python 3.9 or higher
 * [pip](https://pip.pypa.io/en/stable/) for package management
+* Tkinter, for the plot and animation windows. It ships with Python on Windows and macOS; on Debian/Ubuntu (and WSL), install it with:
+
+  ```bash
+  sudo apt install python3-tk
+  ```
 
 ## Installation
 
@@ -126,7 +131,7 @@ python train_model.py \
   --model path/to/model.csv \
   --learning-rate 0.1 \
   --iter 5000 \
-  [--plot] [--evaluate]
+  [--plot] [--evaluate] [--animate [--mileage [NUMBER]]]
 ```
 
 * `--data` (`-d`): Path to the training data CSV (default: `data/data.csv`).
@@ -135,6 +140,8 @@ python train_model.py \
 * `--iter` (`-i`): Number of gradient descent iterations (1–50000, default: 5000).
 * `--plot` (`-p`): Display a scatter plot of the data and the fitted regression line.
 * `--evaluate` (`-e`): Print performance metrics (R², RMSE, MAE) after training.
+* `--animate` (`-a`): Replay the gradient descent in an animation: the line moves from its initial state to the fitted one, while the cost goes down. The final state stays on screen until the window is closed.
+* `--mileage` (`-k`): With `--animate`, ask the model the price of a car at this mileage (0–1,000,000). The answer shows up once the line is trained.
 
 After training, the model parameters are saved to the specified CSV.
 
@@ -174,10 +181,12 @@ ft_linear_regression/
 │	├── train_model.py		   # CLI for training the model
 │	├── predict_price.py		# CLI for predicting prices
 │	├── evaluate_model.py   # CLI for standalone evaluation
+│	├── training_animation.py # Animation of the gradient descent
 │	└── utils.py				# Path helper
 ├── tests/
 │   ├── test_cli.py		 # End-to-end CLI tests
-│   └── test_linear_regression.py # Unit tests for algorithm
+│   ├── test_linear_regression.py # Unit tests for algorithm
+│   └── test_training_animation.py # Unit tests for the animation
 ├── pytest.ini # Used to say pytest where the source files are
 └── requirements.txt		# Python dependencies
 ```

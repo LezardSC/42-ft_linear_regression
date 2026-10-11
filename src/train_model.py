@@ -3,6 +3,7 @@ import argparse
 
 from utils import get_path
 from linear_regression import LinearRegression
+from training_animation import TrainingAnimation
 
 
 def check_iter(value: str) -> int:
@@ -51,6 +52,29 @@ def check_lr(value: str) -> float:
 	return float_value
 
 
+def check_mileage(value: str) -> float:
+	"""
+	Validate and convert a mileage.
+
+	Parameters:
+		value (str): The raw string input for the mileage.
+
+	Returns:
+		float: The validated mileage between 0 and 1 million km.
+
+	Raises:
+		argparse.ArgumentTypeError: If conversion fails or value is out of range.
+	"""
+
+	try:
+		float_value = float(value)
+	except ValueError:
+		raise argparse.ArgumentTypeError(f"The mileage has to be a number, not '{value}'")
+	if not (0 <= float_value <= 1e6):
+		raise argparse.ArgumentTypeError("The mileage has to be between 0 and 1 million km")
+	return float_value
+
+
 def build_parser(description: str) -> argparse.ArgumentParser:
 	"""
 	Construct the command-line argument parser for the training script.
@@ -59,7 +83,7 @@ def build_parser(description: str) -> argparse.ArgumentParser:
 		description (str): Text to display at the top of the help message.
 
 	Returns:
-		argparse.ArgumentParser: Configured parser with data, model, lr, iter, and plot options.
+		argparse.ArgumentParser: Configured parser with data, model, lr, iter, plot, evaluate and animate options.
 	"""
 	
 	parser = argparse.ArgumentParser(description=description)
@@ -104,17 +128,30 @@ def build_parser(description: str) -> argparse.ArgumentParser:
 		dest="evaluate_prediction",
 		help="Evaluate the precision of the linear regression."
 	)
+	parser.add_argument(
+		"-a", "--animate",
+		action="store_true",
+		help="Animate the gradient descent in a window."
+	)
+	parser.add_argument(
+		"-k", "--mileage",
+		type=check_mileage,
+		metavar="[0-1000000]",
+		help="With --animate, ask the model the price of a car at this mileage."
+	)
 	return parser
 
 
 def main():
 	"""
 	Load training data, fit a LinearRegression model, save its parameters,
-	and optionally display the regression plot.
+	and optionally display the regression plot, its evaluation and its training animation.
 	"""
 
 	parser = build_parser("Train a linear regression model.")
 	args = parser.parse_args()
+	if args.mileage is not None and not args.animate:
+		parser.error("--mileage is only used with --animate")
 
 	try:
 		df = pds.read_csv(args.data)
@@ -134,7 +171,7 @@ def main():
 
 	model = LinearRegression(learning_rate=args.learning_rate, n_iter=args.n_iter)
 	try:
-		model.fit(x, y)
+		model.fit(x, y, record_history=args.animate)
 	except ValueError as e:
 		print(f"Error fitting model: {e}")
 		return
@@ -148,6 +185,11 @@ def main():
 		except ValueError as e:
 			print(f"Error evaluating model: {e}")
 			return
+	if args.animate:
+		try:
+			TrainingAnimation(x, y, model, args.mileage).show()
+		except RuntimeError as e:
+			print(f"Error: {e}")
 
 if __name__ == '__main__':
 	main()

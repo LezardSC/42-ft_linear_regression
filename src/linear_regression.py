@@ -18,9 +18,11 @@ class LinearRegression:
 		x_max (float): Maximum of training feature values.
 		y_min (float): Minimum of training target values.
 		y_max (float): Maximum of training target values.
+		history (list | None): (theta0, theta1, cost) at each iteration of the last fit,
+			on the original scale, when recorded.
 
 	Methods:
-		fit(x, y): Train the model on feature array x and target y.
+		fit(x, y, record_history): Train the model on feature array x and target y.
 		predict(x): Predict target values for given feature(s).
 		save(csv_path): Save learned parameters to CSV.
 		load(csv_path): Load parameters from CSV, silent if missing or empty.
@@ -44,6 +46,7 @@ class LinearRegression:
 		self.x_max = None
 		self.y_min = None
 		self.y_max = None
+		self.history = None
 	
 	def _compute_min_max(self, values: np.ndarray) -> tuple:
 		"""
@@ -94,13 +97,15 @@ class LinearRegression:
 		theta0 = theta0_norm * scale_y - theta1 * self.x_min + self.y_min
 		return theta0, theta1
 	
-	def _gradient_descent(self, x, y):
+	def _gradient_descent(self, x, y, history=None):
 		"""
 		Perform gradient descent on normalized data to learn parameters.
 
 		Parameters:
 			x (np.ndarray): Normalized feature array.
 			y (np.ndarray): Normalized target array.
+			history (list, optional): If given, (theta0, theta1, cost) on normalized data
+				is appended before each update and after the last one.
 
 		Returns:
 			tuple: (theta0, theta1) after training on normalized data.
@@ -114,21 +119,30 @@ class LinearRegression:
 			estimate_y = theta1 * x + theta0
 			cost_function = estimate_y - y
 
+			if history is not None:
+				history.append((theta0, theta1, (cost_function ** 2).sum() / (2 * m)))
+
 			gradient0 = (1 / m) * cost_function.sum()
 			gradient1 = (1 / m) * (cost_function * x).sum()
 
 			theta0 -= self.learning_rate * gradient0
 			theta1 -= self.learning_rate * gradient1
 
+		if history is not None:
+			cost_function = theta1 * x + theta0 - y
+			history.append((theta0, theta1, (cost_function ** 2).sum() / (2 * m)))
+
 		return theta0, theta1
 
-	def fit(self, x, y):
+	def fit(self, x, y, record_history=False):
 		"""
 		Train the linear regression model on provided data.
 
 		Parameters:
 			x (np.ndarray): Feature values.
 			y (np.ndarray): Target values.
+			record_history (bool): Keep (theta0, theta1, cost) of every iteration in
+				self.history. The cost stays on the normalized scale.
 
 		Raises:
 			ValueError: If x or y is empty.
@@ -144,8 +158,15 @@ class LinearRegression:
 		x_norm = self._normalize(x, self.x_min, self.x_max)
 		y_norm = self._normalize(y, self.y_min, self.y_max)
 
-		theta0_norm, theta1_norm = self._gradient_descent(x_norm, y_norm)
+		history_norm = [] if record_history else None
+		theta0_norm, theta1_norm = self._gradient_descent(x_norm, y_norm, history_norm)
 		self.theta0, self.theta1 = self._denormalize_thetas(theta0_norm, theta1_norm)
+
+		self.history = None
+		if record_history:
+			self.history = [
+				(*self._denormalize_thetas(t0, t1), cost) for t0, t1, cost in history_norm
+			]
 
 
 	def evaluate(self, x: np.ndarray, y: np.ndarray) -> dict:

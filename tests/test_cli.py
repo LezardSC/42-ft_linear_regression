@@ -83,3 +83,25 @@ def test_predict_price_output(clear_env, tmp_path, capsys, monkeypatch):
 	captured = capsys.readouterr()
 	# Estimated price = 1 + 2*3 = 7.00
 	assert "7.00" in captured.out
+
+
+def test_train_model_animate(clear_env, monkeypatch):
+	paths = clear_env
+	shown = []
+	monkeypatch.setattr(tm.TrainingAnimation, '__init__', lambda self, x, y, model, mileage: shown.append((model.history is not None, mileage)))
+	monkeypatch.setattr(tm.TrainingAnimation, 'show', lambda self: None)
+	testargs = ["train_model.py", "-d", paths['data'], "-m", paths['model'], "--animate", "--mileage", "3"]
+	monkeypatch.setattr(sys, 'argv', testargs)
+
+	tm.main()
+
+	# the model was trained with its history and the animation asked about the mileage
+	assert shown == [(True, 3.0)]
+
+
+@pytest.mark.parametrize("args", [["--mileage", "3"], ["--animate", "--mileage", "-1"], ["--animate", "--mileage", "abc"]])
+def test_train_model_bad_mileage(clear_env, monkeypatch, args):
+	paths = clear_env
+	monkeypatch.setattr(sys, 'argv', ["train_model.py", "-d", paths['data'], "-m", paths['model'], *args])
+	with pytest.raises(SystemExit):
+		tm.main()
